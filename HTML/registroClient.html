@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html Lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width,initial-scale=1.0">
+        <title>Registro - Mesa de Ayuda</title>
+        <style type="text/css"> 
+            label { font-size: 18px; } 
+            form { width: 500px; border: 1px solid black; }
+            input { margin: 7px; padding: 2px; } 
+            .form-label { margin-bottom: 0!important; }     
+            .txt { display: inline-block; width: 80%; outline: none; margin: 0; }
+        </style> 
+    </head>
+<body>
+    <center><img src="HelpDeskGirl.png" alt="Nuestra imagen corporativa" style="width:200px;height:150px;"></center>
+    <center>
+        <h1>Sistema de Mesa de Ayuda</h1>
+        <h2>Registro de Nuevo Usuario</h2>
+    </center>
+
+    <center>
+    <form class="form" style="background-color:#d8f7cf" width="100px" border="1">
+        <br>
+        <table>
+            <tr style="height:10px;">
+                <td><label class="form-label">Nombre Completo</label></td>               
+            </tr>
+            <tr>    
+                <td><input class="txt" name="nombre" id="nombre" type="text" placeholder="Tu Nombre y Apellido"><br></td>
+            </tr>
+            <tr><td>&nbsp;</td></tr>
+            <tr style="height:10px;">
+                <td><label class="form-label">E-mail</label></td>               
+            </tr>
+            <tr>    
+                <td><input class="txt" name="contacto" id="contacto" type="email" placeholder="Correo Electrónico"><br></td>
+            </tr>
+            <tr><td>&nbsp;</td></tr>
+            <tr style="height:10px;">
+                <td><label class="form-label">Contraseña</label></td>               
+            </tr>
+            <tr>    
+                <td><input class="txt" name="password" id="password" type="password" placeholder="Contraseña"><br></td>
+            </tr>
+            <tr><td><br></td></tr>
+            <tr>
+                <td><center><a href="http://127.0.0.1:5500/HTML/loginClient.html">¿Ya tienes una cuenta? Inicia sesión</a></center></td>
+            </tr>
+            <tr><td><br><input name="termscondition" id="termscondition" type="checkbox"> Acepto los términos y condiciones</p></br></td></tr>
+            <tr><td><span id="resultado"></span></td></tr>
+        </table>
+        
+        <button type="submit">Registrarse</button>
+        <br><br>
+    </form>
+    </center>
+
+    <!-- Script para la lógica del registro --> 
+    <script src="registroClient.js" type="module"></script>
+</body>
+</html>
