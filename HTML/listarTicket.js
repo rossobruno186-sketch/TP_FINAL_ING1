@@ -27,8 +27,9 @@ console.log("id:"+query.id);
 console.log("contacto:"+query.contacto);
 console.log("ultima_fecha:"+query.fecha_ultimo_ingreso);
 console.log("mode:"+query.mode);
+console.log("nombre:"+query.nombre);
 
-document.getElementById("lastlogin").innerHTML = "<table><tr><td>Cliente</td><td>"+query.id+"</td></tr><tr><td>Contacto</td><td>"+query.contacto+"</td></tr></tr><tr><td>Ultimo ingreso</td><td>"+query.fecha_ultimo_ingreso+"</td></tr></table>";
+document.getElementById("lastlogin").innerHTML = "<table><tr><td>Cliente (E-mail)</td><td>" + query.contacto + "</td></tr><tr><td>Nombre</td><td>" + query.nombre + "</td></tr><tr><td>Último ingreso</td><td>" + query.fecha_ultimo_ingreso + "</td></tr></table>";
 
 
 const systemURL={ 

@@ -138,7 +138,7 @@ formE1.addEventListener('submit', (event) => {
 			console.log(
 				'Datos en respuesta del application server=' + JSON.stringify(users)
 			);
-			console.log('users.response=' + users.password);
+			//console.log('users.response=' + users.password);
 			if (users.response == 'OK') {
 				//<==Habilitar esto para dejar que el API REST verifique sin exponer la password
 				console.log('La password es correcta');
@@ -164,7 +164,7 @@ formE1.addEventListener('submit', (event) => {
 						'?id=' +
 						users.id +
 						'&contacto=' +
-						users.contacto +
+						data.contacto +
 						'&nombre=' +
 						users.nombre +
 						'&fecha_ultimo_ingreso=' +
@@ -176,7 +176,7 @@ formE1.addEventListener('submit', (event) => {
 					'?id=' +
 					users.id +
 					'&contacto=' +
-					users.contacto +
+					data.contacto +
 					'&nombre=' +
 					users.nombre +
 					'&fecha_ultimo_ingreso=' +
