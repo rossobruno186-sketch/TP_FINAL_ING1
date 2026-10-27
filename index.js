@@ -592,3 +592,61 @@ app.post('/api/updateTicket', (req,res) => {
 
 });
 /*-------------------------------------------------[ Fin del API REST ]-------------------------------------------------------------*/
+
+/*-----------------
+/api/resumenTickets
+API REST para obtener resumen de tickets validando usuario y contraseña (GET y POST)
+-----------------*/
+const resumenTicketsHandler = (req, res) => {
+    // 1. Soportar GET (URL) y POST (JSON) a prueba de errores
+    const body = req.body || {};
+    const query = req.query || {};
+    const contacto = body.contacto || query.contacto;
+    const password = body.password || query.password;
+
+    console.log("resumenTickets: contacto(" + contacto + ") password(" + password + ")");
+
+    if (!contacto || !password) {
+        res.status(400).send(JSON.stringify({response : "ERROR", message : "Faltan credenciales (contacto o password)"}));
+        return;
+    }
+
+    // 2. Validar que el cliente exista usando la misma búsqueda del login
+    scanDb(contacto)
+    .then(resultDbCliente => {
+        
+        if (resultDbCliente.length == 0) {
+            res.status(400).send(JSON.stringify({response : "ERROR", message : "Cliente no existe"}));
+            return;
+        }
+
+        const cliente = resultDbCliente[0]; // Tomamos los datos del cliente encontrado
+        
+        if (password !== cliente.password) {
+            res.status(400).send(JSON.stringify({response : "ERROR", message : "Contraseña incorrecta"}));
+            return;
+        }
+
+        // 3. Si la clave está bien, buscamos los tickets vinculados a su ID numérico
+        scanDbTicket(cliente.id)
+        .then(resultDbTickets => {
+            
+            res.status(200).send(JSON.stringify({
+                response: "OK",
+                cantidad_tickets: resultDbTickets.length,
+                detalle_tickets: resultDbTickets
+            }));
+            
+        }).catch(err => {
+            res.status(400).send(JSON.stringify({response : "ERROR", message : "Error al buscar los tickets"}));
+        });
+        
+    })
+    .catch(err => {
+        res.status(400).send(JSON.stringify({response : "ERROR", message : "Error de acceso a la BD"}));
+    });
+};
+
+// Asignamos la misma función para que soporte los métodos GET y POST
+app.get('/api/resumenTickets', resumenTicketsHandler);
+app.post('/api/resumenTickets', resumenTicketsHandler);
