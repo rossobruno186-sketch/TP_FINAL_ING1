@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html Lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Resetear Contraseña - Mesa de Ayuda</title>
+    <style type="text/css"> 
+        /* Usar los mismos estilos que en loginClient.html */
+        label { font-size: 18px; } 
+        form { width: 500px; border: 1px solid black; }
+        input { margin: 7px; padding: 2px; } 
+        .txt { display: inline-block; width: 80%; outline: none; margin: 0; }
+    </style> 
+</head>
+<body>
+    <center><img src="HelpDeskGirl.png" alt="Nuestra imagen corporativa" style="width:200px;height:150px;"></center>
+    <center>
+        <h1>Sistema de Mesa de Ayuda</h1>
+        <h2>Restablecer Contraseña</h2>
+    </center>
+
+    <center>
+    <form class="form" style="background-color:#d8f7cf" width="100px" border="1">
+        <br>
+        <table>
+            <tr><td><label>E-mail (Contacto)</label></td></tr>
+            <tr><td><input class="txt" name="contacto" type="email" placeholder="Correo Electrónico"></td></tr>
+            
+            <tr><td><label>Nueva Contraseña</label></td></tr>
+            <tr><td><input class="txt" name="password_1" type="password" placeholder="Nueva Contraseña"></td></tr>
+            
+            <tr><td><label>Repetir Nueva Contraseña</label></td></tr>
+            <tr><td><input class="txt" name="password_2" type="password" placeholder="Repita la Contraseña"></td></tr>
+            
+            <tr><td><span id="resultado"></span></td></tr>
+            <tr>
+                <td><center><a href="loginClient.html">Volver al Login</a></center></td>
+            </tr>
+        </table>
+        <button type="submit">Cambiar Contraseña</button>
+        <br><br>
+    </form>
+    </center>
+
+    <script src="resetClient.js" type="module"></script>
+</body>
+</html>
