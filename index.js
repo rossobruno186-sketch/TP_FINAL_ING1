@@ -412,38 +412,72 @@ app.post('/api/listarTicket', (req,res) => {
 });
 
 /*---------
-  getTicket
-  API REST para obtener los detalles de un ticket
+  /api/getTicket (Modificado para Punto 7)
+  API REST para obtener el detalle de un ticket validando credenciales (GET y POST)
 */
-app.post('/api/getTicket', (req,res) => {
-    const {id}  = req.body;
-    console.log("getTicket: id("+id+")");
+const getTicketHandler = (req, res) => {
+    // 1. Soportar GET (URL) y POST (JSON)
+    const body = req.body || {};
+    const query = req.query || {};
+    const contacto = body.contacto || query.contacto;
+    const password = body.password || query.password;
+    const id = body.id || query.id; // Este es el ID del ticket a buscar
+
+    console.log("getTicket: contacto(" + contacto + ") password(" + password + ") ticketID(" + id + ")");
  
-    if (!id) {
-        res.status(400).send({response : "ERROR" , message: "ticket id no informada"});
+    if (!contacto || !password || !id) {
+        res.status(400).send(JSON.stringify({response : "ERROR" , message: "Faltan datos (contacto, password o id del ticket)"}));
         return;
     }
-    var params = {
-        TableName: "ticket",
-        Key: {
-            "id" : id
-            //"clienteID": "0533a95d-7eef-4c6b-b753-1a41c9d1fbd0"   
-            //"id"       : "e08905a8-4aab-45bf-9948-4ba2b8602ced"
+
+    // 2. Validar que el cliente exista y la contraseña sea correcta
+    scanDb(contacto)
+    .then(resultDbCliente => {
+        
+        if (resultDbCliente.length == 0) {
+            res.status(400).send(JSON.stringify({response : "ERROR", message : "Cliente no existe"}));
+            return;
         }
-    };
-    docClient.get(params, function (err, data) {
-        if (err) {
-            res.status(400).send(JSON.stringify({response : "ERROR", message : "DB access error "+err}));
+
+        const cliente = resultDbCliente[0];
+        
+        if (password !== cliente.password) {
+            res.status(400).send(JSON.stringify({response : "ERROR", message : "Contraseña incorrecta"}));
+            return;
         }
-        else {
-            if (Object.keys(data).length == 0) {
-                res.status(400).send({response : "ERROR" , message : "ticket invalido"});
-            } else {
-                res.status(200).send(JSON.stringify({response : "OK", "data" : data}));    
-            }    
-        }
+
+        // 3. Si la clave está bien, buscamos el ticket específico
+        var params = {
+            TableName: "ticket",
+            Key: { "id" : id }
+        };
+        
+        docClient.get(params, function (err, data) {
+            if (err) {
+                res.status(400).send(JSON.stringify({response : "ERROR", message : "Error de acceso a la BD"}));
+            }
+            else {
+                if (Object.keys(data).length == 0) {
+                    res.status(400).send(JSON.stringify({response : "ERROR" , message : "El ticket no existe"}));
+                } else {
+                    // Chequeo extra de seguridad: verificar que el ticket sea de este cliente
+                    if (data.Item.clienteID !== cliente.id) {
+                        res.status(400).send(JSON.stringify({response : "ERROR", message : "Este ticket no pertenece a su cuenta"}));
+                        return;
+                    }
+                    res.status(200).send(JSON.stringify({response : "OK", "data" : data.Item}));    
+                }    
+            }
+        });
     })
-});
+    .catch(err => {
+        res.status(400).send(JSON.stringify({response : "ERROR", message : "Error al procesar la solicitud"}));
+    });
+};
+
+// Asignamos la función para que soporte los métodos GET y POST
+app.get('/api/getTicket', getTicketHandler);
+app.post('/api/getTicket', getTicketHandler);
 
 /*-----------------
 /api/addTicket
