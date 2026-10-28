@@ -1,4 +1,3 @@
-
 /*---
 Función para procesar los parámetros recibidos en el URL
 */
@@ -29,7 +28,26 @@ console.log("ultima_fecha:"+query.fecha_ultimo_ingreso);
 console.log("mode:"+query.mode);
 console.log("nombre:"+query.nombre);
 
-document.getElementById("lastlogin").innerHTML = "<table><tr><td>Cliente (E-mail)</td><td>" + query.contacto + "</td></tr><tr><td>Nombre</td><td>" + query.nombre + "</td></tr><tr><td>Último ingreso</td><td>" + query.fecha_ultimo_ingreso + "</td></tr></table>";
+//Formatear la fecha a dd/mm/yyyy (en caso de que venga en formato ISO o YYYY-MM-DD)
+let fechaFormateada = query.fecha_ultimo_ingreso || '';
+if (fechaFormateada && !fechaFormateada.includes('/')) {
+    const d = new Date(fechaFormateada);
+    if (!isNaN(d.getTime())) {
+        const dd = String(d.getUTCDate()).padStart(2, '0');
+        const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+        const yyyy = d.getUTCFullYear();
+        fechaFormateada = `${dd}/${mm}/${yyyy}`;
+    }
+}
+//Renderizar la tabla con los 4 campos solicitados
+document.getElementById("lastlogin").innerHTML = `
+    <table>
+        <tr><td>Cliente</td><td>${query.id}</td></tr>
+        <tr><td>Nombre</td><td>${query.nombre}</td></tr>
+        <tr><td>Contacto</td><td>${query.contacto}</td></tr>
+        <tr><td>Último ingreso</td><td>${fechaFormateada}</td></tr>
+    </table>
+`;
 
 
 const systemURL={ 

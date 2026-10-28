@@ -240,7 +240,7 @@ app.post('/api/addCliente', (req, res) => {
         }
 
         // 2. Si resultDb está vacío (el correo es nuevo), procedemos a crearlo
-        const nuevoId = Date.now().toString(); 
+        const nuevoId = crypto.randomUUID();
         const fechaActual = new Date().toISOString().split('T')[0];
 
         const params = {
