@@ -1,4 +1,20 @@
 const formE1 = document.querySelector('.form');
+const linkRegistro = document.getElementById('linkRegistro');
+
+// Función auxiliar para habilitar o deshabilitar visual y funcionalmente el link
+function setLinkRegistroHabilitado(habilitado) {
+    if (habilitado) {
+        linkRegistro.style.pointerEvents = 'auto';
+        linkRegistro.style.color = '#0275d8';
+        linkRegistro.style.textDecoration = 'underline';
+        linkRegistro.style.cursor = 'pointer';
+    } else {
+        linkRegistro.style.pointerEvents = 'none';
+        linkRegistro.style.color = 'gray';
+        linkRegistro.style.textDecoration = 'none';
+        linkRegistro.style.cursor = 'not-allowed';
+    }
+}
 
 /*---
     Intercepta el submit del formulario
@@ -125,6 +141,7 @@ formE1.addEventListener('submit', (event) => {
 		API='https://fmtj0jrpp9.execute-api.us-east-1.amazonaws.com/default/loginUserGET?ID=' + data.id + '&PASSWORD=' + data.password;
     	APIoptions = { method: 'GET' };
 	}
+	
 	/*-----
     Realiza el acceso al API Rest utilizando gestión de sincronización mediante promesas
 	utiliza URL y options definidos en los pasos anteriores
@@ -138,39 +155,10 @@ formE1.addEventListener('submit', (event) => {
 			console.log(
 				'Datos en respuesta del application server=' + JSON.stringify(users)
 			);
-			//console.log('users.response=' + users.password);
+			
 			if (users.response == 'OK') {
 				//<==Habilitar esto para dejar que el API REST verifique sin exponer la password
 				console.log('La password es correcta');
-				console.log(
-					'nombre(' +
-						users.nombre +
-						') fecha_ultimo_ingreso(' +
-						users.fecha_ultimo_ingreso +
-						')' +
-						'mode(' + MODE + ')'
-				);
-				console.log(
-					'id=' +
-						users.id +
-						' nombre=' +
-						users.nombre +
-						' ultimo=' +
-						users.fecha_ultimo_ingreso
-				);
-				console.log(
-					'changing to ' +
-						systemURL.listarTicket +
-						'?id=' +
-						users.id +
-						'&contacto=' +
-						data.contacto +
-						'&nombre=' +
-						users.nombre +
-						'&fecha_ultimo_ingreso=' +
-						users.fecha_ultimo_ingreso +
-						'&mode=' + MODE
-				);
 				window.location.href =
 					systemURL.listarTicket +
 					'?id=' +
@@ -183,10 +171,23 @@ formE1.addEventListener('submit', (event) => {
 					users.fecha_ultimo_ingreso +
 					'&mode=' + MODE;
 			} else {
-				console.log('La password no es correcta');
-				document.getElementById('resultado1').style.color = 'RED'; /*--Fix hecho por  Germán Lombardi IS1-2025 */
-				document.getElementById('resultado1').textContent =
-					'Error de login, intente nuevamente';                  /*--Fix hecho por  Germán Lombardi IS1-2025 */
+				console.log('Error al intentar loguearse:', users.message);
+				document.getElementById('resultado1').style.color = 'RED'; 
+				
+				// Si el backend nos dice que el cliente no existe ("Cliente invalido")
+				if (users.message === 'Cliente invalido') {
+					document.getElementById('resultado1').textContent = 'El correo ingresado no está registrado. Se ha habilitado la opción de registro.';
+					setLinkRegistroHabilitado(true); // Encendemos el link
+				} else {
+					// Si el error es otro (ej. "usuario incorrecto" por mala contraseña)
+					document.getElementById('resultado1').textContent = 'Error: ' + users.message;
+					setLinkRegistroHabilitado(false); // Mantenemos el link apagado
+				}
 			}
+		})
+		.catch(err => {
+			console.error("Error en la conexión con la API:", err);
+			document.getElementById('resultado1').style.color = 'RED';
+			document.getElementById('resultado1').textContent = 'Error de conexión con el servidor.';
 		});
 });

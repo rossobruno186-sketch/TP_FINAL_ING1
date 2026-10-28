@@ -198,6 +198,27 @@ async function scanDb(contacto) {
 }
 
 /*----
+  /api/verificarCliente/:contacto
+  Permite verificar si un correo electrónico ya existe en la base de datos
+*/
+app.get('/api/verificarCliente/:contacto', (req, res) => {
+    const { contacto } = req.params;
+    scanDb(contacto)
+    .then(resultDb => {
+        if (resultDb.length > 0) {
+            // El usuario ya existe en DynamoDB
+            res.status(200).send({ existe: true });
+        } else {
+            // El usuario NO existe (puede registrarse)
+            res.status(200).send({ existe: false });
+        }
+    })
+    .catch(err => {
+        res.status(400).send({ error: "Error al consultar la BD: " + err });
+    });
+});
+
+/*----
   /api/addCliente
   Esta API permite registrar un nuevo cliente validando que el correo no exista
 */
