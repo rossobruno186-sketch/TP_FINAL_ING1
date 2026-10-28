@@ -5,12 +5,21 @@ formE1.addEventListener('submit', (event) => {
     const formData = new FormData(formE1);
     const data = Object.fromEntries(formData);
 
-    if (data.nombre == '' || data.contacto == '' || data.password == '') {
+    // 1. Verificamos que ningún campo esté vacío (incluyendo confirmar contraseña)
+    if (data.nombre == '' || data.contacto == '' || data.password == '' || data.confirmPassword == '') {
         document.getElementById('resultado').style.color = 'RED';
         document.getElementById('resultado').textContent = 'Debe completar todos los campos.';
         return;
     }
 
+    // 2. NUEVO: Validamos que las contraseñas coincidan
+    if (data.password !== data.confirmPassword) {
+        document.getElementById('resultado').style.color = 'RED';
+        document.getElementById('resultado').textContent = 'Error: Las contraseñas no coinciden.';
+        return;
+    }
+
+    // 3. Verificamos los términos y condiciones
     if (data.termscondition != 'on') {
         document.getElementById('resultado').style.color = 'RED';
         document.getElementById('resultado').textContent = 'Debe aceptar los términos y condiciones.';
@@ -34,7 +43,8 @@ formE1.addEventListener('submit', (event) => {
             document.getElementById('resultado').style.color = 'GREEN';
             document.getElementById('resultado').textContent = 'Registro exitoso. Redirigiendo al login...';
             setTimeout(() => {
-                window.location.href = 'http://127.0.0.1:5500/HTML/loginClient.html';
+                // Redirección con ruta relativa corregida
+                window.location.href = 'loginClient.html';
             }, 2000);
         } else {
             document.getElementById('resultado').style.color = 'RED';

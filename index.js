@@ -1,4 +1,3 @@
-
 /*-----------------------------------------------------------------------------------------------------------------
   MesaAyuda.js debe copiarse al directorio del proyecto express como index.js
 
@@ -200,38 +199,51 @@ async function scanDb(contacto) {
 
 /*----
   /api/addCliente
-  Esta API permite registrar un nuevo cliente en la base de datos
+  Esta API permite registrar un nuevo cliente validando que el correo no exista
 */
 app.post('/api/addCliente', (req, res) => {
     const { nombre, contacto, password } = req.body;
 
     if (!nombre || !contacto || !password) {
-        res.status(400).send({response: "ERROR", message: "Faltan datos obligatorios"});
+        res.status(400).send(JSON.stringify({response: "ERROR", message: "Faltan datos obligatorios"}));
         return;
     }
 
-    // Generar ID único numérico y fecha actual
-    const nuevoId = Date.now().toString(); 
-    const fechaActual = new Date().toISOString().split('T')[0];
-
-    const params = {
-        TableName: "cliente",
-        Item: {
-            "id": nuevoId,
-            "nombre": nombre,
-            "contacto": contacto,
-            "password": password,
-            "activo": true,
-            "fecha_ultimo_ingreso": fechaActual
+    // 1. Buscamos en la base de datos si el correo ya existe
+    scanDb(contacto)
+    .then(resultDb => {
+        // Si resultDb tiene datos, significa que encontró un usuario con ese email
+        if (resultDb.length > 0) {
+            res.status(400).send(JSON.stringify({response: "ERROR", message: "Este correo electrónico ya está registrado."}));
+            return;
         }
-    };
 
-    docClient.put(params, function (err, data) {
-        if (err) {
-            res.status(400).send(JSON.stringify({response: "ERROR", message: "Error guardando en DB: " + err}));
-        } else {
-            res.status(200).send(JSON.stringify({response: "OK", message: "Usuario registrado"}));
-        }
+        // 2. Si resultDb está vacío (el correo es nuevo), procedemos a crearlo
+        const nuevoId = Date.now().toString(); 
+        const fechaActual = new Date().toISOString().split('T')[0];
+
+        const params = {
+            TableName: "cliente",
+            Item: {
+                "id": nuevoId,
+                "nombre": nombre,
+                "contacto": contacto,
+                "password": password,
+                "activo": true,
+                "fecha_ultimo_ingreso": fechaActual
+            }
+        };
+
+        docClient.put(params, function (err, data) {
+            if (err) {
+                res.status(400).send(JSON.stringify({response: "ERROR", message: "Error guardando en DB: " + err}));
+            } else {
+                res.status(200).send(JSON.stringify({response: "OK", message: "Usuario registrado"}));
+            }
+        });
+    })
+    .catch(err => {
+        res.status(400).send(JSON.stringify({response: "ERROR", message: "Error al validar en la BD"}));
     });
 });
 /*----------

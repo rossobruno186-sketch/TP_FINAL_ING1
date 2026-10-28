@@ -44,9 +44,21 @@
             <tr>    
                 <td><input class="txt" name="password" id="password" type="password" placeholder="Contraseña"><br></td>
             </tr>
+            
+            <!-- NUEVO BLOQUE: Confirmar Contraseña -->
+            <tr><td>&nbsp;</td></tr>
+            <tr style="height:10px;">
+                <td><label class="form-label">Confirmar Contraseña</label></td>               
+            </tr>
+            <tr>    
+                <td><input class="txt" name="confirmPassword" id="confirmPassword" type="password" placeholder="Confirmar Contraseña"><br></td>
+            </tr>
+            <!-- FIN NUEVO BLOQUE -->
+
             <tr><td><br></td></tr>
             <tr>
-                <td><center><a href="http://127.0.0.1:5500/HTML/loginClient.html">¿Ya tienes una cuenta? Inicia sesión</a></center></td>
+                <!-- Enlace corregido a ruta relativa -->
+                <td><center><a href="loginClient.html">¿Ya tienes una cuenta? Inicia sesión</a></center></td>
             </tr>
             <tr><td><br><input name="termscondition" id="termscondition" type="checkbox"> Acepto los términos y condiciones</p></br></td></tr>
             <tr><td><span id="resultado"></span></td></tr>
