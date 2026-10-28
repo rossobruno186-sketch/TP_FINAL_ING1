@@ -54,7 +54,7 @@ AWS
 
 const HTMLResponse=document.querySelector("#app");
 var ticket = {
-    "ID" : query.id,
+    "clienteID" : query.id,
 };
     
 var options = {
@@ -69,7 +69,7 @@ switch (query.mode) {
     console.log("API_listarTicket:"+RESTAPI.listarTicket); 
   
     ticket = {
-       "ID" : query.id,
+       "clienteID" : query.id,
     };
     
     options = {
