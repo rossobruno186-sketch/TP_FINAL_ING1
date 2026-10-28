@@ -358,7 +358,7 @@ Permite cambiar la password de un cliente buscando por E-mail (contacto)
 */
 app.post('/api/resetCliente', (req,res) => {
     
-    // Ahora recibimos 'contacto' en lugar de 'id'
+    // Recibimos 'contacto' y 'password'
     const {contacto} = req.body;
     const {password} = req.body;
  
@@ -381,9 +381,19 @@ app.post('/api/resetCliente', (req,res) => {
         }
 
         const cliente = resultDb[0];
-        const realId = cliente.id; // Extraemos el UUID real de la base de datos
+        
+        // 2. NUEVO: Verificamos que la nueva contraseña no sea igual a la vieja
+        if (cliente.password === password) {
+            res.status(400).send(JSON.stringify({
+                response: "ERROR", 
+                message: "La nueva contraseña no puede ser igual a la anterior."
+            }));
+            return; // Frenamos la ejecución acá
+        }
 
-        // 2. Actualizamos la contraseña usando el ID real
+        const realId = cliente.id; // Extraemos el UUID real
+
+        // 3. Actualizamos la contraseña
         const paramsUpdate = { 
             ExpressionAttributeNames: { "#p": "password" }, 
             ExpressionAttributeValues: { ":p": password }, 
