@@ -139,19 +139,40 @@ app.post('/api/loginCliente', (req,res) => {
             const cliente = resultDb[0];
             if (password == cliente.password) {
                 if (cliente.activo == true) {
-                    res.status(200).send(JSON.stringify({
-                        response : "OK", 
-                        "id" : cliente.id, 
-                        "nombre" : cliente.nombre, 
-                        "contacto" : cliente.contacto, 
-                        "fecha_ultimo_ingreso": cliente.fecha_ultimo_ingreso
-                    }));    
+                    // 1. Calcular la fecha actual (DD/MM/YYYY)
+                    const hoy = new Date();
+                    const dd = String(hoy.getDate()).padStart(2, '0');
+                    const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+                    const yyyy = hoy.getFullYear();
+                    const fechaActual = `${dd}/${mm}/${yyyy}`;
+                    // 2. Parámetros para actualizar en DynamoDB
+                    const paramsUpdate = {
+                        TableName: "cliente",
+                        Key: { "id": cliente.id },
+                        UpdateExpression: "SET #f = :f",
+                        ExpressionAttributeNames: { "#f": "fecha_ultimo_ingreso" },
+                        ExpressionAttributeValues: { ":f": fechaActual },
+                        ReturnValues: "ALL_NEW"
+                    };
+                    // 3. Ejecutar la actualización en la BD y responder
+                    docClient.update(paramsUpdate, function (err, data) {
+                        if (err) {
+                            console.log("Error al actualizar fecha_ultimo_ingreso: " + err);
+                        }
+                        res.status(200).send(JSON.stringify({
+                            response : "OK", 
+                            "id" : cliente.id, 
+                            "nombre" : cliente.nombre, 
+                            "contacto" : cliente.contacto, 
+                            "fecha_ultimo_ingreso": fechaActual
+                        }));
+                    });
                 } else {
                     res.status(400).send(JSON.stringify({response : "ERROR", message : "Cliente no activo"}));    
                 }
             } else {
                 res.status(400).send(JSON.stringify({response : "ERROR" , message : "usuario incorrecto"}));
-            }    
+            }   
         }
     })
     .catch(err => {
