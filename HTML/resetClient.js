@@ -19,9 +19,9 @@ formE1.addEventListener('submit', (event) => {
         return;
     }
 
-    // 3. Preparar los datos para la API (El backend espera 'id' y 'password')
+    // 3. Preparar los datos para la API (Ahora mandamos 'contacto' y 'password')
     const resetData = {
-        id: data.contacto, // Tu backend usa el email como ID
+        contacto: data.contacto, // Usamos 'contacto' tal como lo espera ahora el backend
         password: data.password_1
     };
 
@@ -37,7 +37,8 @@ formE1.addEventListener('submit', (event) => {
             document.getElementById('resultado').style.color = 'GREEN';
             document.getElementById('resultado').textContent = 'Contraseña actualizada con éxito. Redirigiendo...';
             setTimeout(() => {
-                window.location.href = 'http://127.0.0.1:5500/HTML/loginClient.html';
+                // Ruta relativa para evitar problemas de IP si se prueba en otra compu
+                window.location.href = 'loginClient.html';
             }, 2000);
         } else {
             document.getElementById('resultado').style.color = 'RED';

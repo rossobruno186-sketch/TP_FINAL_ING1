@@ -354,68 +354,57 @@ app.post('/api/updateCliente', (req,res) => {
 });
 /*-------
 /api/resetCliente
-Permite cambiar la password de un cliente
+Permite cambiar la password de un cliente buscando por E-mail (contacto)
 */
 app.post('/api/resetCliente', (req,res) => {
     
-    const {id}       = req.body;
+    // Ahora recibimos 'contacto' en lugar de 'id'
+    const {contacto} = req.body;
     const {password} = req.body;
  
-    if (!id) {
-        res.status(400).send({response : "ERROR" , message: "Id no informada"});
+    if (!contacto) {
+        res.status(400).send(JSON.stringify({response: "ERROR", message: "E-mail (Contacto) no informado"}));
         return;
     }
 
     if (!password) {
-        res.status(400).send({response : "ERROR" , message: "Password no informada"});
+        res.status(400).send(JSON.stringify({response: "ERROR", message: "Password no informada"}));
         return;
     }
 
-    var params = {
-        TableName: "cliente",
-        Key: {
-            "id" : id
-            //test use "id": "0533a95d-7eef-4c6b-b753-1a41c9d1fbd0"   
-             }
-        };
-        
-    docClient.get(params, function (err, data) {
-        if (err)  {
-            res.status(400).send(JSON.stringify({response : "ERROR", message : "DB access error "+ null}));
+    // 1. Buscamos al usuario por su correo
+    scanDb(contacto)
+    .then(resultDb => {
+        if (resultDb.length == 0) {
+            res.status(400).send(JSON.stringify({response: "ERROR", message: "Cliente no existe"}));
             return;
-        } else {
+        }
 
-            if (Object.keys(data).length == 0) {
-                res.status(400).send(JSON.stringify({"response":"ERROR",message : "Cliente no existe"}),null,2);
+        const cliente = resultDb[0];
+        const realId = cliente.id; // Extraemos el UUID real de la base de datos
+
+        // 2. Actualizamos la contraseña usando el ID real
+        const paramsUpdate = { 
+            ExpressionAttributeNames: { "#p": "password" }, 
+            ExpressionAttributeValues: { ":p": password }, 
+            Key: { "id": realId }, 
+            ReturnValues: "ALL_NEW", 
+            TableName: "cliente", 
+            UpdateExpression: "SET #p = :p" 
+        };
+
+        docClient.update(paramsUpdate, function (err, data) {
+            if (err)  {
+                res.status(400).send(JSON.stringify({response: "ERROR", message: "Error al actualizar en BD"}));
                 return;
             } else {
-
-                const paramsUpdate = { 
-   
-                    ExpressionAttributeNames: { 
-                         "#p": "password" 
-                    }, 
-                    ExpressionAttributeValues: { 
-                        ":p": password 
-                   }, 
-                   Key: { 
-                       "id": id 
-                   }, 
-                   ReturnValues: "ALL_NEW", 
-                   TableName: "cliente", 
-                   UpdateExpression: "SET #p = :p" 
-                };
-                docClient.update(paramsUpdate, function (err, data) {
-                    if (err)  {
-                        res.status(400).send(JSON.stringify({response : "ERROR", message : "DB access error "+err}));
-                        return;
-                    } else {
-                        res.status(200).send(JSON.stringify({response : "OK", message : "updated" , "data": data}));
-                    }    
-                });    
-            }
-        }    
+                res.status(200).send(JSON.stringify({response: "OK", message: "Contraseña actualizada exitosamente"}));
+            }    
+        });    
     })
+    .catch(err => {
+        res.status(400).send(JSON.stringify({response: "ERROR", message: "Error consultando la BD"}));
+    });
 });
 /*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*=*
 /*                                                       API REST ticket                                                             *
