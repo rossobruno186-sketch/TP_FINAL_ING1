@@ -39,13 +39,11 @@ formE1.addEventListener('submit', (event) => {
     })
     .then(res => res.json())
     .then(respuesta => {
-        if (respuesta.response == 'OK') {
-            document.getElementById('resultado').style.color = 'GREEN';
-            document.getElementById('resultado').textContent = 'Registro exitoso. Redirigiendo al login...';
-            setTimeout(() => {
-                // Redirección con ruta relativa corregida
-                window.location.href = 'loginClient.html';
-            }, 2000);
+if (respuesta.response == 'OK') {
+            // Mostrar la alerta pop-up
+            window.alert('¡Registro exitoso! Presiona Aceptar para ir al login.');
+            // Redirigir al usuario al login inmediatamente después de que cierre la alerta
+            window.location.href = 'loginClient.html';
         } else {
             document.getElementById('resultado').style.color = 'RED';
             document.getElementById('resultado').textContent = 'Error: ' + respuesta.message;
